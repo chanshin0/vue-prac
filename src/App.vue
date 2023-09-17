@@ -3,37 +3,35 @@
     <a :href="title.toLowerCase()" v-for="title in nav" :key="title">{{ title }}</a>
   </div>
 
+  <!-- 1. 라우터 뷰, 라우터 링크 -->
+  <!-- 2. 파니아 사용법 -->
   <Transition name="fade">
-    <AdsVue v-if="showAds === true"/>
+    <AdsVue v-if="discountRate > 0" :discountRate="discountRate"/>
   </Transition>
 
-  <!-- 1. 카드 컴포넌트로 바꾸기 -->
-  <!-- 2. 가격 순 정렬과 되돌리기 버튼 만들기 -->
-  <!-- 3. 1초마다 할인이 1%씩 감소하게 만들기 -->
   <img alt="Vue logo" src="./assets/logo.png">
   
-  <router-view></router-view>
-  
-  <div v-for="(p, i) in products" :key="i">
-    <hr>
-    <div @click="showModal = true; selected = i;">
-      <img :src="p.image" alt="">
-      <h4>제목 : {{ p.title }}</h4>
-      <p>본문 : {{ p.content }}</p>
-      <p>가격 : {{ p.price }} 원</p>
-    </div>
-    <button @click="()=>abuse_increase(i)">허위매물 신고</button>
-    <span>신고수 : {{ p.abuse }}</span>
+  <!-- <router-view></router-view> -->
+  <div>
+    <button @click="products = products.sort((a,b)=>a.price - b.price)">가격 내림차순</button>
+    <button @click="products = products.sort((a,b)=>b.price - a.price)">가격 오름차순</button>
+    <button @click="products = productsOrigin">되돌리기</button>
   </div>
 
+  <CardVue v-for="(p,i) in products" :key="i" :product="p" @showModal="showModal = true; selected = i"
+  @abuse="products[$event].abuse += 1"
+  />
+
   <Transition name="fade">
-    <ModalVue :products="products" :selected="selected" :showModal="showModal" @closeModal="showModal = $event"/>
+    <ModalVue :products="products" :selected="selected" :showModal="showModal" @closeModal="showModal = $event"
+    />
   </Transition>
-  </template>
+</template>
 
 <script>
 import AdsVue from './components/Ads.vue'
 import ModalVue from './components/Modal.vue'
+import CardVue from './components/Card.vue'
 import {products} from "./post"
 
 export default {
@@ -41,10 +39,11 @@ export default {
   data(){
     return {
       nav : ['Home', 'Shop', 'About'],
+      productsOrigin : [...products], // 깊은 복사 필요
       products,
       showModal: false,
       selected : 0,
-      showAds : true
+      discountRate : 20
     }
   },
   methods : {
@@ -53,13 +52,17 @@ export default {
     }
   },
   mounted() {
-    setTimeout(()=>{
-      this.showAds = false
-    }, 2000)
+    setInterval(()=>{
+      this.discountRate -= 1
+    }, 1000)
   },  
   components: {
     AdsVue,
-    ModalVue
+    ModalVue,
+    CardVue
+  },
+  updated(){
+    // console.log(this.productsOrigin[2].price)
   }
 }
 </script>
