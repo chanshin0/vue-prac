@@ -1,6 +1,6 @@
 <template>
   <div class="menu">
-    <a href="" v-for="title in nav" :key="title">{{ title }}</a>
+    <a :href="title.toLowerCase()" v-for="title in nav" :key="title">{{ title }}</a>
   </div>
 
   <Transition name="fade">
@@ -11,6 +11,9 @@
   <!-- 2. 가격 순 정렬과 되돌리기 버튼 만들기 -->
   <!-- 3. 1초마다 할인이 1%씩 감소하게 만들기 -->
   <img alt="Vue logo" src="./assets/logo.png">
+  
+  <router-view></router-view>
+  
   <div v-for="(p, i) in products" :key="i">
     <hr>
     <div @click="showModal = true; selected = i;">
